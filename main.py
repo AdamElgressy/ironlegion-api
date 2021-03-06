@@ -1,51 +1,25 @@
+from dataclasses import dataclass
 from typing import List
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <h2>Your ID: <span id="ws-id"></span></h2>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var client_id = Date.now()
-            document.querySelector("#ws-id").textContent = client_id;
-            var ws = new WebSocket(`ws://localhost:8000/ws/${client_id}`);
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = {}  # client_id connection val-pair.
+        self.active_connections: List[WebSocket] = []  # client_id connection val-pair.
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
@@ -54,13 +28,12 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
-    #
-    # async def send_personal_message(self, message: str, websocket: WebSocket):
-    #     await websocket.send_text(message)
-    #
-    # async def broadcast(self, message: str):
-    #     for connection in self.active_connections:
-    #         await connection.send_text(message)
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
 
     def get(self, client_id: int) -> WebSocket:
         return self.active_connections[client_id]
@@ -69,23 +42,28 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@app.get("/")
-async def get():
-    return HTMLResponse(html)
+@dataclass
+class InventoryItem:
+    """Class for keeping track of an item in inventory."""
+    name: str
+    unit_price: float
+    quantity_on_hand: int = 0
 
 
-#
-# @app.get("/{client_id}/start")
-# async def start():
-#     return websocket_start()
+# add avatar middleware
+# add client middleware
+def get_client(client_id):
+    return None
 
 
-@app.get("/{client_id}/stop")
-async def stop(client_id):
-    return _stop(client_id)
+async def _stop(client_id, avatar_id):
+    client = get_client(client_id)
+    await client.stop(avatar_id)
 
 
-@app.post("/")
+@app.get("/{client_id}/stop/{avatar_id}")
+async def stop(client_id: str, avatar_id: str):
+    return _stop(client_id, avatar_id)
 
 
 @app.websocket("/ws/{client_id}")
@@ -102,10 +80,14 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
         await manager.broadcast(f"Client #{client_id} left the chat")
 
 
-# add avatar middleware
-# add client middleware
-async def _stop(client_id, avatar_id):
-    client = get_client(client_id)
-    await client.stop(avatar_id)
+@app.get("/")
+async def read_main():
+    return {"msg": "Hello World"}
 
+
+@app.websocket_route("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    await websocket.send_json({"msg": "Hello WebSocket"})
+    await websocket.close()
 

@@ -1,0 +1,68 @@
+{
+  "avatars": [
+    {
+      "uuid": "f9cfa2b0-bdfe-4b37-a969-75827d3b56e6",
+      "type": "iron_man",
+      "name": "My First Avatar",
+      "position": {
+        "lat": 23.23,
+        "lng": 44.44
+      },
+      "missions": {
+        "past_missions": [
+          {
+            "mission": {
+              "uuid": "25870aa9-afca-4f02-95b4-e215f3e7ac9e",
+              "name": "First Mission Name",
+              "end_position": {
+                "lat": 23.23,
+                "lng": 44.44
+              }
+            },
+            "resolution": "Success or Failure or ADAM!"
+          }
+        ],
+        "current_mission": {
+          "mission": {
+            "uuid": "e48c51ba-210f-4443-8e06-500495770f4c",
+            "name": "Take Over The World",
+            "end_position": {
+              "lat": 23.23,
+              "lng": 44.44
+            }
+          },
+          "status": "In Progress or Paused or ADAM!"
+        },
+        "future_missions": [
+          {
+            "uuid": "28e545d7-9af9-4d31-9473-8b63badbc990",
+            "name": "Take Over The World",
+            "end_position": {
+              "lat": 23.23,
+              "lng": 44.44
+            }
+          },
+          {
+            "uuid": "bfc320f7-e4f3-47f9-900d-c3c6a900e748",
+            "name": "Take Over The World",
+            "end_position": {
+              "lat": 23.23,
+              "lng": 44.44
+            }
+          }
+        ]
+      }
+    },
+    {
+      "uuid": "017eb4c1-b42b-4933-90d5-0379d6367ec1",
+      "type": "thor",
+      "name": "Thor Avatar",
+      "position": {
+        "lat": 23.23,
+        "lng": 44.44
+      },
+      "missions": [],
+      "current_mission": "null"
+    }
+  ]
+}

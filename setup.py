@@ -4,7 +4,7 @@ setuptools.setup(
     name="ironlegion-api",
     version="0.0.0",
     author="Adam Elgressy",
-    author_email="author@example.com",
+    author_email="aelgressy3020@gmail.com",
     description="API for the IronLegion Project",
     url="https://github.com/AdamElgressy/ironlegion-api",
     packages=setuptools.find_packages(),
